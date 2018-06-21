@@ -4,8 +4,6 @@
  // Author : Eugene Rockey
  // Copyright 2018, All Rights Reserved
 
- //test Kaden
-
 
 .section ".data"					//student comment here
 .equ	DDRB,0x04					//student comment here
