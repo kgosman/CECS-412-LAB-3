@@ -6,13 +6,17 @@
  
  //no includes, no ASF, no libraries
  
+
+
+ 
  const char MS1[] = "\r\nECE-412 ATMega328P Tiny OS";
  const char MS2[] = "\r\nby Eugene Rockey Copyright 2018, All Rights Reserved";
  const char MS3[] = "\r\nMenu: (L)CD, (A)CD, (E)EPROM\r\n";
  const char MS4[] = "\r\nReady: ";
  const char MS5[] = "\r\nInvalid Command Try Again...";
  const char MS6[] = "Volts\r";
- 
+ char output[] = "Group 1 is #1  d";
+ int keyStroke = 0;
  
 
 void LCD_Init(void);			//external Assembly functions
@@ -23,6 +27,7 @@ void UART_Put(void);
 void LCD_Write_Data(void);
 void LCD_Write_Command(void);
 void LCD_Read_Data(void);
+void LCD_Delay(void);
 void Mega328P_Init(void);
 void ADC_Get(void);
 void EEPROM_Read(void);
@@ -67,9 +72,10 @@ void HELP(void)						//Display available Tiny OS Commands on Terminal
 	UART_Puts(MS3);
 }
 
+
+
 void LCD(void)						//Lite LCD demo
 {
-	DATA = 0x34;					//Student Comment Here
 	LCD_Write_Command();
 	DATA = 0x08;					//Student Comment Here
 	LCD_Write_Command();
@@ -79,7 +85,36 @@ void LCD(void)						//Lite LCD demo
 	LCD_Write_Command();
 	DATA = 0x0f;					//Student Comment Here
 	LCD_Write_Command();
-	LCD_Puts("Hello World");	//remember to check resistors
+	LCD_Puts(output);
+	ASCII = '\0';	
+		//remember to check resistors
+	
+	char c, load, store;
+	int i;
+	while(ASCII == '\0'){
+		
+		c = output[15];
+		store = output[0];
+		for(i = 1; i < 16; i++){
+			load = output[i];
+			output[i] = store;
+			store = load;
+		}
+		output[0] = c;
+		DATA = 0x34;					//Student Comment Here
+		LCD_Write_Command();
+		DATA = 0x08;					//Student Comment Here
+		LCD_Write_Command();
+		DATA = 0x02;					//Student Comment Here
+		LCD_Write_Command();
+		DATA = 0x06;					//Student Comment Here
+		LCD_Write_Command();
+		DATA = 0x0f;					//Student Comment Here
+		LCD_Write_Command();
+		LCD_Puts(output);
+	}
+	
+	
 	/*
 	Re-engineer this subroutine to have the LCD endlessly scroll a marquee sign of 
 	your Team's name either vertically or horizontally. Any key press should stop
