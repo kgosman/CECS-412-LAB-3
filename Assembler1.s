@@ -4,7 +4,7 @@
  // Author : Eugene Rockey
  // Copyright 2018, All Rights Reserved
 
-
+ //Greg 
 .section ".data"					//student comment here
 .equ	DDRB,0x04					//student comment here
 .equ	DDRD,0x0A					//student comment here
@@ -45,6 +45,8 @@
 .set	temp,0				//student comment here
 
 .section ".text"			//student comment here
+
+//Mo
 .global Mega328P_Init
 Mega328P_Init:
 		ldi	r16,0x07		;PB0(R*W),PB1(RS),PB2(E) as fixed outputs
@@ -72,6 +74,7 @@ Mega328P_Init:
 		sts DIDR1,r16		//student comment here
 		ret					//student comment here
 	
+//Kaden
 .global LCD_Write_Command
 LCD_Write_Command:
 	call	UART_Off		//student comment here
@@ -125,6 +128,8 @@ LCD_Read_Data:
 	call	UART_On			//student comment here
 	ret						//student comment here
 
+
+//Austin
 .global UART_On
 UART_On:
 	ldi		r16,2				//student comment here
@@ -165,6 +170,7 @@ UART_Put:
 	sts		UDR0,r16			//student comment here
 	ret							//student comment here
 
+//Mason
 .global ADC_Get
 ADC_Get:
 		ldi		r16,0xC7			//student comment here
