@@ -37,6 +37,8 @@
 .equ	EEMPE,2						//student comment here
 .equ	EERIE,3						//student comment here
 
+.global EELOCH
+.global EELOCL
 .global HADC				//student comment here
 .global LADC				//student comment here
 .global ASCII				//student comment here
@@ -188,8 +190,8 @@ A2V1:	lds		r16,ADCSRA			//student comment here
 EEPROM_Write:      
 		sbic    EECR,EEPE
 		rjmp    EEPROM_Write		; Wait for completion of previous write
-		ldi		r18,0x00			; Set up address (r18:r17) in address register
-		ldi		r17,0x05 
+		lds		r18,EELOCH			; Set up address (r18:r17) in address register
+		lds		r17,EELOCL 
 		ldi		r16,'F'				; Set up data in r16    
 		out     EEARH, r18      
 		out     EEARL, r17			      
@@ -202,8 +204,8 @@ EEPROM_Write:
 EEPROM_Read:					    
 		sbic    EECR,EEPE    
 		rjmp    EEPROM_Read		; Wait for completion of previous write
-		ldi		r18,0x00		; Set up address (r18:r17) in EEPROM address register
-		ldi		r17,0x05
+		lds		r18,EELOCH		; Set up address (r18:r17) in EEPROM address register
+		lds		r17,EELOCL
 		ldi		r16,0x00   
 		out     EEARH, r18   
 		out     EEARL, r17		   

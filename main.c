@@ -8,7 +8,7 @@
  
  const char MS1[] = "\r\nECE-412 ATMega328P Tiny OS";
  const char MS2[] = "\r\nby Eugene Rockey Copyright 2018, All Rights Reserved";
- const char MS3[] = "\r\nMenu: (L)CD, (A)CD, (E)EPROM\r\n";
+ const char MS3[] = "\r\nMenu: (L)CD, (A)CD, (E)EPROM, (U)USART\r\n";
  const char MS4[] = "\r\nReady: ";
  const char MS5[] = "\r\nInvalid Command Try Again...";
  const char MS6[] = "Volts\r";
@@ -28,6 +28,8 @@ void ADC_Get(void);
 void EEPROM_Read(void);
 void EEPROM_Write(void);
 
+int EELOCH;						//memory location for EEPROM storing High and Low
+int EELOCL;
 unsigned char ASCII;			//shared I/O variable with Assembly
 unsigned char DATA;				//shared internal variable with Assembly
 char HADC;						//shared ADC variable with Assembly
@@ -118,6 +120,7 @@ void ADC(void)						//Lite Demo of the Analog to Digital Converter
 
 void EEPROM(void)
 {
+	char eeGet[] = "0x####";
 	UART_Puts("\r\nEEPROM Write and Read.");
 	/*
 	Re-engineer this subroutine so that a byte of data can be written to any address in EEPROM
@@ -126,6 +129,16 @@ void EEPROM(void)
 	8-bit data value. Utilize the following two given Assembly based drivers to communicate with the EEPROM. You
 	may modify the EEPROM drivers as needed. User must be able to always return to command line.
 	*/
+	UART_Puts("input memory location in this format: 0x####");
+	for (int i = 0; i < 6; i++){
+		ASCII = '\0';
+		while (ASCII == '\0'){
+			UART_Get();
+			}
+		eeGet[i] = ASCII;
+	}
+	EELOCH = (eeGet[2] - 48) + (eeGet[3] - 48);
+	EELOCL = (eeGet[4] - 48) + (eeGet[5] - 48);
 	UART_Puts("\r\n");
 	EEPROM_Write();
 	UART_Puts("\r\n");
@@ -134,6 +147,10 @@ void EEPROM(void)
 	UART_Puts("\r\n");
 }
 
+void USART(void)
+{
+	
+}
 
 void Command(void)					//command interpreter
 {
@@ -150,6 +167,8 @@ void Command(void)					//command interpreter
 		case 'A' | 'a': ADC();
 		break;
 		case 'E' | 'e': EEPROM();
+		break;
+		case 'U' | 'u': USART();
 		break;
 		default:
 		UART_Puts(MS5);
