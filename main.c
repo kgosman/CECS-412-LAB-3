@@ -129,13 +129,15 @@ void EEPROM(void)
 	8-bit data value. Utilize the following two given Assembly based drivers to communicate with the EEPROM. You
 	may modify the EEPROM drivers as needed. User must be able to always return to command line.
 	*/
-	UART_Puts("input memory location in this format: 0x####");
+	UART_Puts("\r\ninput memory location in this format: 0x####");
+
 	for (int i = 0; i < 6; i++){
 		ASCII = '\0';
 		while (ASCII == '\0'){
 			UART_Get();
 			}
 		eeGet[i] = ASCII;
+		UART_Puts(eeGet[i]);
 	}
 	EELOCH = (eeGet[2] - 48) + (eeGet[3] - 48);
 	EELOCL = (eeGet[4] - 48) + (eeGet[5] - 48);
@@ -147,9 +149,52 @@ void EEPROM(void)
 	UART_Puts("\r\n");
 }
 
+void BAUD(void)
+{
+
+
+}
+
+void DATAb(void)
+{
+	UART_Puts("\r\n# of Data Bits\r\n(1)5-bits\r\n(2)6-bits\r\n(3)7-bits\r\n(4)8-bits\r\n(5)9-bits\r\n");
+
+}
+
+void PARITY(void)
+{
+	UART_Puts("\r\nParity\r\n(1)even\r\n(2)odd\r\n(3)none\r\n");
+
+}
+
+void STOPb(void)
+{
+	UART_Puts("\r\n# of Stop bits\r\n(1)1-bit\r\n(2)2-bits\r\n(3)");
+
+}
+
 void USART(void)
 {
-	
+	UART_Puts("\r\nUSART Config\r\n(1)Baud Rate\r\n(2)# of Data bits\r\n(3)Parity\r\n(4)# of Stop Bits\r\n");
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1': BAUD();
+		break;
+		case '2': DATAb();
+		break;
+		case '3': PARITY();
+		break;
+		case '4': STOPb();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
 }
 
 void Command(void)					//command interpreter
