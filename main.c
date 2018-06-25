@@ -27,9 +27,14 @@ void Mega328P_Init(void);
 void ADC_Get(void);
 void EEPROM_Read(void);
 void EEPROM_Write(void);
+void SETB(void);
+void SETC(void);
+void CLEARB(void);
+void CLEARC(void);
 
 int EELOCH;						//memory location for EEPROM storing High and Low
 int EELOCL;
+int USARTDATA;					//used to set or clear bits in UCSR0B or UCSR0C
 unsigned char ASCII;			//shared I/O variable with Assembly
 unsigned char DATA;				//shared internal variable with Assembly
 char HADC;						//shared ADC variable with Assembly
@@ -158,19 +163,70 @@ void BAUD(void)
 void DATAb(void)
 {
 	UART_Puts("\r\n# of Data Bits\r\n(1)5-bits\r\n(2)6-bits\r\n(3)7-bits\r\n(4)8-bits\r\n(5)9-bits\r\n");
-
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1': BAUD();
+		break;
+		case '2': DATAb();
+		break;
+		case '3': PARITY();
+		break;
+		case '4': STOPb();
+		break;
+		case '5': STOPb();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
 }
 
 void PARITY(void)
 {
 	UART_Puts("\r\nParity\r\n(1)even\r\n(2)odd\r\n(3)none\r\n");
-
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1': BAUD();
+		break;
+		case '2': DATAb();
+		break;
+		case '3': PARITY();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
 }
 
 void STOPb(void)
 {
-	UART_Puts("\r\n# of Stop bits\r\n(1)1-bit\r\n(2)2-bits\r\n(3)");
-
+	USARTDATA = 8;
+	UART_Puts("\r\n# of Stop bits\r\n(1)1-bit\r\n(2)2-bits\r\n");
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1': CLEARC();
+		break;
+		case '2': SETC();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
 }
 
 void USART(void)

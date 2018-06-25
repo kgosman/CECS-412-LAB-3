@@ -39,6 +39,7 @@
 
 .global EELOCH
 .global EELOCL
+.global USARTDATA
 .global HADC				//student comment here
 .global LADC				//student comment here
 .global ASCII				//student comment here
@@ -214,6 +215,44 @@ EEPROM_Read:
 		sts		ASCII,r16  
 		ret
 
+.global SETC
+SETC: 
+		lds		r16, UCSR0C
+		lds		r17, USARTDATA
+		or		r16, r17
+		sts		UCSR0C, r16
+		ret		
+
+.global CLEARC
+CLEARC: 
+		lds		r16, UCSR0C
+		ldi		r17, 0xFF
+		lds		r18, USARTDATA
+		sub		r17, r18
+		and		r16, r17
+		sts		UCSR0C, r16
+		ret
+
+.global SETB
+SETB: 
+		lds		r16, UCSR0B
+		ldi		r17, 0xFF
+		lds		r18, USARTDATA
+		sub		r17, r18
+		and		r16, r17
+		sts		UCSR0B, r16
+		ret
+
+.global CLEARB
+CLEARB:
+		lds		r16, UCSR0B
+		lds		r17, USARTDATA
+		or		r16, r17
+		sts		UCSR0B, r16
+		ret
+	
 
 		.end
+
+
 
