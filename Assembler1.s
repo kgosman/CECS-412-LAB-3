@@ -39,6 +39,8 @@
 
 .global EELOCH
 .global EELOCL
+.global BAUDH
+.global BAUDL
 .global USARTDATA
 .global HADC				//student comment here
 .global LADC				//student comment here
@@ -136,42 +138,42 @@ LCD_Read_Data:
 .global UART_On
 UART_On:
 	ldi		r16,2				//student comment here
-	out		DDRD,r16			//student comment here
-	ldi		r16,24				//student comment here
-	sts		UCSR0B,r16			//student comment here
-	ret							//student comment here
+	out		DDRD,r16			//set data direction register to 00000010
+	ldi		r16,24				
+	sts		UCSR0B,r16			//Enables UART reciever and transmitter
+	ret						
 
 .global UART_Off
 UART_Off:
-	ldi	r16,0					//student comment here
-	sts UCSR0B,r16				//student comment here
-	ret							//student comment here
+	ldi	r16,0					
+	sts UCSR0B,r16				//disables reciever and transmitter
+	ret					
 
 .global UART_Clear
 UART_Clear:
-	lds		r16,UCSR0A			//student comment here
-	sbrs	r16,RXC0			//student comment here
-	ret							//student comment here
-	lds		r16,UDR0			//student comment here
-	rjmp	UART_Clear			//student comment here
+	lds		r16,UCSR0A			//recives register status from UART
+	sbrs	r16,RXC0			//skips next line if data was recieved
+	ret							
+	lds		r16,UDR0			//puts data into register, clears memory address
+	rjmp	UART_Clear			//jumps back to begining
 
 .global UART_Get
 UART_Get:
-	lds		r16,UCSR0A			//student comment here
-	sbrs	r16,RXC0			//student comment here
-	rjmp	UART_Get			//student comment here
-	lds		r16,UDR0			//student comment here
-	sts		ASCII,r16			//student comment here
-	ret							//student comment here
+	lds		r16,UCSR0A			//recives register status from UART
+	sbrs	r16,RXC0			//skips next line if data was recieved
+	rjmp	UART_Get			//jumps back if data was not recieved
+	lds		r16,UDR0			//recives data 
+	sts		ASCII,r16			//puts data into ASCII
+	ret							
 
 .global UART_Put
 UART_Put:
-	lds		r17,UCSR0A			//student comment here
-	sbrs	r17,UDRE0			//student comment here
-	rjmp	UART_Put			//student comment here
-	lds		r16,ASCII			//student comment here
-	sts		UDR0,r16			//student comment here
-	ret							//student comment here
+	lds		r17,UCSR0A			//recives register status from UART
+	sbrs	r17,UDRE0			//skips next line if UART not in transmitting mode
+	rjmp	UART_Put
+	lds		r16,ASCII			//recieves put data
+	sts		UDR0,r16			//outputs data
+	ret	
 
 //Mason
 .global ADC_Get
@@ -250,7 +252,14 @@ CLEARB:
 		or		r16, r17
 		sts		UCSR0B, r16
 		ret
-	
+
+.global SETBAUD
+SETBAUD:
+		lds		r16, BAUDL
+		lds		r17, BAUDH
+		sts		UBRR0L,r16
+		sts		UBRR0H,r17
+		ret
 
 		.end
 

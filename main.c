@@ -31,9 +31,12 @@ void SETB(void);
 void SETC(void);
 void CLEARB(void);
 void CLEARC(void);
+void SETBAUD(void);
 
 int EELOCH;						//memory location for EEPROM storing High and Low
 int EELOCL;
+int BAUDH;						
+int BAUDL;
 int USARTDATA;					//used to set or clear bits in UCSR0B or UCSR0C
 unsigned char ASCII;			//shared I/O variable with Assembly
 unsigned char DATA;				//shared internal variable with Assembly
@@ -156,7 +159,33 @@ void EEPROM(void)
 
 void BAUD(void)
 {
-
+	UART_Puts("\r\nBaud rater\n(1)9600\r\n(2)2400\r\n(3)1200\r\n");
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1':
+		BAUDH = 0;
+		BAUDL = 103;
+		SETBAUD();
+		break;
+		case '2':
+		BAUDH = 1;
+		BAUDL = 159;
+		SETBAUD();
+		break;
+		case '3':
+		BAUDH = 3;
+		BAUDL = 63;
+		SETBAUD();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
 
 }
 
@@ -170,15 +199,39 @@ void DATAb(void)
 	}
 	switch (ASCII)
 	{
-		case '1': BAUD();
+		case '1':
+		USARTDATA = 6;
+		CLEARC();
+		USARTDATA = 4;
+		CLEARB();
 		break;
-		case '2': DATAb();
+		case '2':
+		USARTDATA = 4;
+		CLEARC();
+		USARTDATA = 2;
+		SETC();
+		USARTDATA = 4;
+		CLEARB();
 		break;
-		case '3': PARITY();
+		case '3':
+		USARTDATA = 4;
+		SETC();
+		USARTDATA = 2;
+		CLEARC();
+		USARTDATA = 4;
+		CLEARB();
 		break;
-		case '4': STOPb();
+		case '4':
+		USARTDATA = 6;
+		SETC();
+		USARTDATA = 4;
+		CLEARB();
 		break;
-		case '5': STOPb();
+		case '5':
+		USARTDATA = 6;
+		SETC();
+		USARTDATA = 4;
+		SETB();
 		break;
 		default:
 		UART_Puts("\r\nIncorrect input\r\n");
@@ -196,11 +249,19 @@ void PARITY(void)
 	}
 	switch (ASCII)
 	{
-		case '1': BAUD();
+		case '1':
+		USARTDATA = 48;
+		CLEARC();
 		break;
-		case '2': DATAb();
+		case '2':
+		USARTDATA = 32;
+		SETC();
+		USARTDATA = 16;
+		CLEARC();
 		break;
-		case '3': PARITY();
+		case '3':
+		USARTDATA = 48;
+		SETC();
 		break;
 		default:
 		UART_Puts("\r\nIncorrect input\r\n");
