@@ -4,7 +4,8 @@
  // Author : Eugene Rockey
  // Copyright 2018, All Rights Reserved
  
- //no includes, no ASF, no libraries
+
+
  
  const char MS1[] = "\r\nECE-412 ATMega328P Tiny OS";
  const char MS2[] = "\r\nby Eugene Rockey Copyright 2018, All Rights Reserved";
@@ -12,7 +13,8 @@
  const char MS4[] = "\r\nReady: ";
  const char MS5[] = "\r\nInvalid Command Try Again...";
  const char MS6[] = "Volts\r";
- 
+ char output[] = "Group 1 is #1                Group 1 is #1                Group 1 is #1";
+ int keyStroke = 0;
  
 
 void LCD_Init(void);			//external Assembly functions
@@ -23,6 +25,7 @@ void UART_Put(void);
 void LCD_Write_Data(void);
 void LCD_Write_Command(void);
 void LCD_Read_Data(void);
+void LCD_Delay(void);
 void Mega328P_Init(void);
 void ADC_Get(void);
 void EEPROM_Read(void);
@@ -67,9 +70,12 @@ void HELP(void)						//Display available Tiny OS Commands on Terminal
 	UART_Puts(MS3);
 }
 
+
+
 void LCD(void)						//Lite LCD demo
 {
-	DATA = 0x34;					//Student Comment Here
+	int flag = 0;
+	int i = 0;
 	LCD_Write_Command();
 	DATA = 0x08;					//Student Comment Here
 	LCD_Write_Command();
@@ -79,7 +85,21 @@ void LCD(void)						//Lite LCD demo
 	LCD_Write_Command();
 	DATA = 0x0f;					//Student Comment Here
 	LCD_Write_Command();
-	LCD_Puts("Hello World");	//remember to check resistors
+	LCD_Puts(output);
+	for (i = 0; i < 16; i++){
+		DATA = 0x1c;
+		for (int j = 0; j < 50; j++)
+		{
+			LCD_Delay();
+			
+		}
+		if (flag)
+		{
+			break;
+		}
+		LCD_Write_Command();
+	} 
+	
 	/*
 	Re-engineer this subroutine to have the LCD endlessly scroll a marquee sign of 
 	your Team's name either vertically or horizontally. Any key press should stop
