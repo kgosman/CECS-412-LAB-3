@@ -3,9 +3,10 @@
  // Created: 1/30/2018 4:04:52 AM
  // Author : Eugene Rockey
  // Copyright 2018, All Rights Reserved
- 
 
-
+#include <math.h>
+#include <stdio.h>
+#include <time.h>
  
  const char MS1[] = "\r\nECE-412 ATMega328P Tiny OS";
  const char MS2[] = "\r\nby Eugene Rockey Copyright 2018, All Rights Reserved";
@@ -13,6 +14,7 @@
  const char MS4[] = "\r\nReady: ";
  const char MS5[] = "\r\nInvalid Command Try Again...";
  const char MS6[] = "Volts\r";
+ const char MS7[] = " F\r";
  char output[] = "Group 1 is #1                Group 1 is #1                Group 1 is #1";
  int keyStroke = 0;
  
@@ -31,12 +33,13 @@ void ADC_Get(void);
 void EEPROM_Read(void);
 void EEPROM_Write(void);
 
+int FLAG;
 unsigned char ASCII;			//shared I/O variable with Assembly
 unsigned char DATA;				//shared internal variable with Assembly
 char HADC;						//shared ADC variable with Assembly
 char LADC;						//shared ADC variable with Assembly
 
-char volts[5];					//string buffer for ADC output
+char volts[6];					//string buffer for ADC output
 int Acc;						//Accumulator for ADC use
 
 void UART_Puts(const char *str)	//Display a string in the PC Terminal Program
@@ -74,7 +77,7 @@ void HELP(void)						//Display available Tiny OS Commands on Terminal
 
 void LCD(void)						//Lite LCD demo
 {
-	int flag = 0;
+	int FLAG = 0;
 	int i = 0;
 	LCD_Write_Command();
 	DATA = 0x08;					//Student Comment Here
@@ -93,7 +96,8 @@ void LCD(void)						//Lite LCD demo
 			LCD_Delay();
 			
 		}
-		if (flag)
+		UART_Puts("test\r\n");
+		if (FLAG)
 		{
 			break;
 		}
@@ -110,23 +114,35 @@ void LCD(void)						//Lite LCD demo
 
 void ADC(void)						//Lite Demo of the Analog to Digital Converter
 {
-	volts[0x1]='.';
-	volts[0x3]=' ';
-	volts[0x4]= 0;
+	double r, t;
+	int rn = 10000;
+	volts[0x2]='.';
+	volts[0x4]=' ';
+	volts[0x5]= 0;
+	
 	ADC_Get();
-	Acc = (((int)HADC) * 0x100 + (int)(LADC))*0xA;
-	volts[0x0] = 48 + (Acc / 0x7FE);
-	Acc = Acc % 0x7FE;
-	volts[0x2] = ((Acc *0xA) / 0x7FE) + 48;
-	Acc = (Acc * 0xA) % 0x7FE;
-	if (Acc >= 0x3FF) volts[0x2]++;
-	if (volts[0x2] == 58)
-	{
-		volts[0x2] = 48;
-		volts[0x0]++;
-	}
+	Acc = (((int)HADC)*0x100+(int)(LADC));
+	
+	r = (10000.0 * Acc) / (1040.0 - Acc);
+	
+	t = (3950*298.15)/(298.15*log(r/rn) + 3950);
+	
+	t = t - 273.15;						//Convert to C from K
+	
+	t = t*(9/5) + 32;					//Convert to F from C
+
+    int i = t*10; 
+	int j = t;
+	volts[0x0] = i / 100 + 48;
+	
+	volts[0x1] = j % 10 + 48;
+	
+	volts[0x3] = i % 10 + 48;
+
+	
 	UART_Puts(volts);
-	UART_Puts(MS6);
+	UART_Puts(MS7);
+
 	/*
 		Re-engineer this subroutine to display temperature in degrees Fahrenheit on the Terminal.
 		The potentiometer simulates a thermistor, its varying resistance simulates the
