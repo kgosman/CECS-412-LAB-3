@@ -39,6 +39,7 @@
 
 .global EELOCH
 .global EELOCL
+
 .global HADC				//student comment here
 .global LADC				//student comment here
 .global ASCII				//student comment here
@@ -93,6 +94,7 @@ LCD_Write_Command:
 	call	UART_On			//student comment here
 	ret						//student comment here
 
+.global LCD_Delay
 LCD_Delay:
 	ldi		r16,0xFA		//student comment here
 D0:	ldi		r17,0xFF		//student comment here
@@ -129,7 +131,6 @@ LCD_Read_Data:
 	out		PORTB,0			//student comment here
 	call	UART_On			//student comment here
 	ret						//student comment here
-
 
 //Austin
 .global UART_On
