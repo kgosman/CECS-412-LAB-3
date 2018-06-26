@@ -37,9 +37,18 @@ void Mega328P_Init(void);
 void ADC_Get(void);
 void EEPROM_Read(void);
 void EEPROM_Write(void);
+void SETB(void);
+void SETC(void);
+void CLEARB(void);
+void CLEARC(void);
+void SETBAUD(void);
 
 int EELOCH;						//memory location for EEPROM storing High and Low
 int EELOCL;
+
+int BAUDH;						
+int BAUDL;
+int USARTDATA;					//used to set or clear bits in UCSR0B or UCSR0C
 
 unsigned char ASCII;			//shared I/O variable with Assembly
 unsigned char DATA;				//shared internal variable with Assembly
@@ -175,13 +184,15 @@ void EEPROM(void)
 	8-bit data value. Utilize the following two given Assembly based drivers to communicate with the EEPROM. You
 	may modify the EEPROM drivers as needed. User must be able to always return to command line.
 	*/
-	UART_Puts("input memory location in this format: 0x####");
+	UART_Puts("\r\ninput memory location in this format: 0x####");
+
 	for (int i = 0; i < 6; i++){
 		ASCII = '\0';
 		while (ASCII == '\0'){
 			UART_Get();
 			}
 		eeGet[i] = ASCII;
+		UART_Puts(eeGet[i]);
 	}
 	EELOCH = (eeGet[2] - 48) + (eeGet[3] - 48);
 	EELOCL = (eeGet[4] - 48) + (eeGet[5] - 48);
@@ -193,9 +204,161 @@ void EEPROM(void)
 	UART_Puts("\r\n");
 }
 
+void BAUD(void)
+{
+	UART_Puts("\r\nBaud rater\n(1)9600\r\n(2)2400\r\n(3)1200\r\n");
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1':
+		BAUDH = 0;
+		BAUDL = 103;
+		SETBAUD();
+		break;
+		case '2':
+		BAUDH = 1;
+		BAUDL = 159;
+		SETBAUD();
+		break;
+		case '3':
+		BAUDH = 3;
+		BAUDL = 63;
+		SETBAUD();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
+
+}
+
+void DATAb(void)
+{
+	UART_Puts("\r\n# of Data Bits\r\n(1)5-bits\r\n(2)6-bits\r\n(3)7-bits\r\n(4)8-bits\r\n(5)9-bits\r\n");
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1':
+		USARTDATA = 6;
+		CLEARC();
+		USARTDATA = 4;
+		CLEARB();
+		break;
+		case '2':
+		USARTDATA = 4;
+		CLEARC();
+		USARTDATA = 2;
+		SETC();
+		USARTDATA = 4;
+		CLEARB();
+		break;
+		case '3':
+		USARTDATA = 4;
+		SETC();
+		USARTDATA = 2;
+		CLEARC();
+		USARTDATA = 4;
+		CLEARB();
+		break;
+		case '4':
+		USARTDATA = 6;
+		SETC();
+		USARTDATA = 4;
+		CLEARB();
+		break;
+		case '5':
+		USARTDATA = 6;
+		SETC();
+		USARTDATA = 4;
+		SETB();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
+}
+
+void PARITY(void)
+{
+	UART_Puts("\r\nParity\r\n(1)even\r\n(2)odd\r\n(3)none\r\n");
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1':
+		USARTDATA = 48;
+		CLEARC();
+		break;
+		case '2':
+		USARTDATA = 32;
+		SETC();
+		USARTDATA = 16;
+		CLEARC();
+		break;
+		case '3':
+		USARTDATA = 48;
+		SETC();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
+}
+
+void STOPb(void)
+{
+	USARTDATA = 8;
+	UART_Puts("\r\n# of Stop bits\r\n(1)1-bit\r\n(2)2-bits\r\n");
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1': CLEARC();
+		break;
+		case '2': SETC();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
+}
+
 void USART(void)
 {
-	
+	UART_Puts("\r\nUSART Config\r\n(1)Baud Rate\r\n(2)# of Data bits\r\n(3)Parity\r\n(4)# of Stop Bits\r\n");
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get();
+	}
+	switch (ASCII)
+	{
+		case '1': BAUD();
+		break;
+		case '2': DATAb();
+		break;
+		case '3': PARITY();
+		break;
+		case '4': STOPb();
+		break;
+		default:
+		UART_Puts("\r\nIncorrect input\r\n");
+		break;
+	}
 }
 
 void Command(void)					//command interpreter
