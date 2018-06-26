@@ -42,6 +42,7 @@
 .global BAUDH
 .global BAUDL
 .global USARTDATA
+
 .global HADC				//student comment here
 .global LADC				//student comment here
 .global ASCII				//student comment here
@@ -96,6 +97,7 @@ LCD_Write_Command:
 	call	UART_On			//student comment here
 	ret						//student comment here
 
+.global LCD_Delay
 LCD_Delay:
 	ldi		r16,0xFA		//student comment here
 D0:	ldi		r17,0xFF		//student comment here
@@ -132,7 +134,6 @@ LCD_Read_Data:
 	out		PORTB,0			//student comment here
 	call	UART_On			//student comment here
 	ret						//student comment here
-
 
 //Austin
 .global UART_On
@@ -178,16 +179,16 @@ UART_Put:
 //Mason
 .global ADC_Get
 ADC_Get:
-		ldi		r16,0xC7			//student comment here
-		sts		ADCSRA,r16			//student comment here
-A2V1:	lds		r16,ADCSRA			//student comment here
-		sbrc	r16,ADSC			//student comment here
-		rjmp 	A2V1				//student comment here
-		lds		r16,ADCL			//student comment here
-		sts		LADC,r16			//student comment here
-		lds		r16,ADCH			//student comment here
-		sts		HADC,r16			//student comment here
-		ret							//student comment here
+		ldi	r16,0xC7			//Sets 0xC7 to register 16 to be loaded into address ADCSRA  
+		sts	ADCSRA,r16			//r16 is stored to address ADSRA for use in loop
+A2V1:	        lds	r16,ADCSRA		        //loads value stored in ADSRA to r16 a reset of the value
+		sbrc	r16,ADSC			//If the bit in r16 is cleared skips the next instruction, this will end the loop
+	rjmp 	A2V1				//Jumps back to A2V1 to create loop 
+	lds	r16,ADCL			//The low value of the ADC port is stored in r16
+		sts	LADC,r16			//Then the value of ADCL is loaded into a global address to be used in C program
+		lds	r16,ADCH			//The high value of the ADC port is stored in r16
+		sts	HADC,r16			//Then stored to the global address HADC to be used in C program
+		ret					//Returns to the section where call was made
 
 .global EEPROM_Write
 EEPROM_Write:      
