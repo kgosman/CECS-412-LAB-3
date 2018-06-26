@@ -37,6 +37,12 @@
 .equ	EEMPE,2						//student comment here
 .equ	EERIE,3						//student comment here
 
+.global EELOCH
+.global EELOCL
+.global BAUDH
+.global BAUDL
+.global USARTDATA
+
 .global HADC				//student comment here
 .global LADC				//student comment here
 .global ASCII				//student comment here
@@ -91,6 +97,7 @@ LCD_Write_Command:
 	call	UART_On			//student comment here
 	ret						//student comment here
 
+.global LCD_Delay
 LCD_Delay:
 	ldi		r16,0xFA		//student comment here
 D0:	ldi		r17,0xFF		//student comment here
@@ -128,90 +135,135 @@ LCD_Read_Data:
 	call	UART_On			//student comment here
 	ret						//student comment here
 
-
 //Austin
 .global UART_On
 UART_On:
 	ldi		r16,2				//student comment here
-	out		DDRD,r16			//student comment here
-	ldi		r16,24				//student comment here
-	sts		UCSR0B,r16			//student comment here
-	ret							//student comment here
+	out		DDRD,r16			//set data direction register to 00000010
+	ldi		r16,24				
+	sts		UCSR0B,r16			//Enables UART reciever and transmitter
+	ret						
 
 .global UART_Off
 UART_Off:
-	ldi	r16,0					//student comment here
-	sts UCSR0B,r16				//student comment here
-	ret							//student comment here
+	ldi	r16,0					
+	sts UCSR0B,r16				//disables reciever and transmitter
+	ret					
 
 .global UART_Clear
 UART_Clear:
-	lds		r16,UCSR0A			//student comment here
-	sbrs	r16,RXC0			//student comment here
-	ret							//student comment here
-	lds		r16,UDR0			//student comment here
-	rjmp	UART_Clear			//student comment here
+	lds		r16,UCSR0A			//recives register status from UART
+	sbrs	r16,RXC0			//skips next line if data was recieved
+	ret							
+	lds		r16,UDR0			//puts data into register, clears memory address
+	rjmp	UART_Clear			//jumps back to begining
 
 .global UART_Get
 UART_Get:
-	lds		r16,UCSR0A			//student comment here
-	sbrs	r16,RXC0			//student comment here
-	rjmp	UART_Get			//student comment here
-	lds		r16,UDR0			//student comment here
-	sts		ASCII,r16			//student comment here
-	ret							//student comment here
+	lds		r16,UCSR0A			//recives register status from UART
+	sbrs	r16,RXC0			//skips next line if data was recieved
+	rjmp	UART_Get			//jumps back if data was not recieved
+	lds		r16,UDR0			//recives data 
+	sts		ASCII,r16			//puts data into ASCII
+	ret							
 
 .global UART_Put
 UART_Put:
-	lds		r17,UCSR0A			//student comment here
-	sbrs	r17,UDRE0			//student comment here
-	rjmp	UART_Put			//student comment here
-	lds		r16,ASCII			//student comment here
-	sts		UDR0,r16			//student comment here
-	ret							//student comment here
+	lds		r17,UCSR0A			//recives register status from UART
+	sbrs	r17,UDRE0			//skips next line if UART not in transmitting mode
+	rjmp	UART_Put
+	lds		r16,ASCII			//recieves put data
+	sts		UDR0,r16			//outputs data
+	ret	
 
 //Mason
 .global ADC_Get
 ADC_Get:
-		ldi		r16,0xC7			//student comment here
-		sts		ADCSRA,r16			//student comment here
-A2V1:	lds		r16,ADCSRA			//student comment here
-		sbrc	r16,ADSC			//student comment here
-		rjmp 	A2V1				//student comment here
-		lds		r16,ADCL			//student comment here
-		sts		LADC,r16			//student comment here
-		lds		r16,ADCH			//student comment here
-		sts		HADC,r16			//student comment here
-		ret							//student comment here
+	ldi		r16,0xC7			//Sets 0xC7 to register 16 to be loaded into address ADCSRA  
+	sts		ADCSRA,r16			//r16 is stored to address ADSRA for use in loop
+A2V1:
+	lds		r16,ADCSRA			//loads value stored in ADSRA to r16 a reset of the value
+	sbrc	r16,ADSC			//If the bit in r16 is cleared skips the next instruction, this will end the loop
+	rjmp 	A2V1				//Jumps back to A2V1 to create loop 
+	lds		r16,ADCL			//The low value of the ADC port is stored in r16
+	sts		LADC,r16			//Then the value of ADCL is loaded into a global address to be used in C program
+	lds		r16,ADCH			//The high value of the ADC port is stored in r16
+	sts		HADC,r16			//Then stored to the global address HADC to be used in C program
+	ret							//Returns to the section where call was made
 
 .global EEPROM_Write
 EEPROM_Write:      
-		sbic    EECR,EEPE
-		rjmp    EEPROM_Write		; Wait for completion of previous write
-		ldi		r18,0x00			; Set up address (r18:r17) in address register
-		ldi		r17,0x05 
-		ldi		r16,'F'				; Set up data in r16    
-		out     EEARH, r18      
-		out     EEARL, r17			      
-		out     EEDR,r16			; Write data (r16) to Data Register  
-		sbi     EECR,EEMPE			; Write logical one to EEMPE
-		sbi     EECR,EEPE			; Start eeprom write by setting EEPE
-		ret 
+	sbic    EECR,EEPE
+	rjmp    EEPROM_Write		; Wait for completion of previous write
+	lds		r18,EELOCH			; Set up address (r18:r17) in address register
+	lds		r17,EELOCL 
+	ldi		r16,'F'				; Set up data in r16    
+	out     EEARH, r18      
+	out     EEARL, r17			      
+	out     EEDR,r16			; Write data (r16) to Data Register  
+	sbi     EECR,EEMPE			; Write logical one to EEMPE
+	sbi     EECR,EEPE			; Start eeprom write by setting EEPE
+	ret 
 
 .global EEPROM_Read
 EEPROM_Read:					    
-		sbic    EECR,EEPE    
-		rjmp    EEPROM_Read		; Wait for completion of previous write
-		ldi		r18,0x00		; Set up address (r18:r17) in EEPROM address register
-		ldi		r17,0x05
-		ldi		r16,0x00   
-		out     EEARH, r18   
-		out     EEARL, r17		   
-		sbi     EECR,EERE		; Start eeprom read by writing EERE
-		in      r16,EEDR		; Read data from Data Register
-		sts		ASCII,r16  
-		ret
+	sbic    EECR,EEPE    
+	rjmp    EEPROM_Read			; Wait for completion of previous write
+	lds		r18,EELOCH			; Set up address (r18:r17) in EEPROM address register
+	lds		r17,EELOCL
+	ldi		r16,0x00   
+	out     EEARH, r18   
+	out     EEARL, r17		   
+	sbi     EECR,EERE			; Start eeprom read by writing EERE
+	in      r16,EEDR			; Read data from Data Register
+	sts		ASCII,r16  
+	ret
+
+.global SETC
+SETC: 
+	lds		r16, UCSR0C
+	lds		r17, USARTDATA
+	or		r16, r17
+	sts		UCSR0C, r16
+	ret		
+
+.global CLEARC
+CLEARC: 
+	lds		r16, UCSR0C
+	ldi		r17, 0xFF
+	lds		r18, USARTDATA
+	sub		r17, r18
+	and		r16, r17
+	sts		UCSR0C, r16
+	ret
+
+.global SETB
+SETB: 
+	lds		r16, UCSR0B
+	ldi		r17, 0xFF
+	lds		r18, USARTDATA
+	sub		r17, r18
+	and		r16, r17
+	sts		UCSR0B, r16
+	ret
+	
+.global CLEARB
+CLEARB:
+	lds		r16, UCSR0B
+	lds		r17, USARTDATA
+	or		r16, r17
+	sts		UCSR0B, r16
+	ret
+
+.global SETBAUD
+SETBAUD:
+	lds		r16, BAUDL
+	lds		r17, BAUDH
+	sts		UBRR0L,r16
+	sts		UBRR0H,r17
+	ret
+
+.end
 
 
-		.end
 
