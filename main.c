@@ -32,9 +32,11 @@ void SETC(void);
 void CLEARB(void);
 void CLEARC(void);
 void SETBAUD(void);
+void EEMEMORYH(void);
+void EEMEMORYL(void);
+void EEMEMORYR(void);
 
-int EELOCH;						//memory location for EEPROM storing High and Low
-int EELOCL;
+
 int BAUDH;						
 int BAUDL;
 int USARTDATA;					//used to set or clear bits in UCSR0B or UCSR0C
@@ -128,7 +130,6 @@ void ADC(void)						//Lite Demo of the Analog to Digital Converter
 
 void EEPROM(void)
 {
-	char eeGet[] = "0x####";
 	UART_Puts("\r\nEEPROM Write and Read.");
 	/*
 	Re-engineer this subroutine so that a byte of data can be written to any address in EEPROM
@@ -137,18 +138,41 @@ void EEPROM(void)
 	8-bit data value. Utilize the following two given Assembly based drivers to communicate with the EEPROM. You
 	may modify the EEPROM drivers as needed. User must be able to always return to command line.
 	*/
-	UART_Puts("\r\ninput memory location in this format: 0x####");
-
-	for (int i = 0; i < 6; i++){
+	UART_Puts("\r\ninput memory location in this format: 0x####\n\r");
+	EEMEMORYR();
+	for (int i = 0; i < 6; i++)
+	{
 		ASCII = '\0';
-		while (ASCII == '\0'){
+		while (ASCII == '\0')
+		{
 			UART_Get();
+		}
+		UART_Put();
+			if(i == 2)
+			{
+				DATA = ASCII-48;
+				DATA*=16;
+				EEMEMORYH();
 			}
-		eeGet[i] = ASCII;
-		UART_Puts(eeGet[i]);
+			if (i == 3)
+			{
+				DATA = ASCII-48;
+				EEMEMORYH();
+			}
+				
+			if (i == 4)
+			{
+				DATA = ASCII-48;
+				DATA*=16;
+				EEMEMORYL();
+			}
+			if (i == 5)
+			{
+				DATA = ASCII-48;
+				EEMEMORYL();
+			}
+			
 	}
-	EELOCH = (eeGet[2] - 48) + (eeGet[3] - 48);
-	EELOCL = (eeGet[4] - 48) + (eeGet[5] - 48);
 	UART_Puts("\r\n");
 	EEPROM_Write();
 	UART_Puts("\r\n");
