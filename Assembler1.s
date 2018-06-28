@@ -1,7 +1,7 @@
  // Lab3P1.s
  //
- // Created: 1/30/2018 4:15:16 AM
- // Author : Eugene Rockey
+ // Created: 6/21/2018 4:15:16 AM
+ // Author : Group 1
  // Copyright 2018, All Rights Reserved
 
  //Greg 
@@ -167,6 +167,15 @@ UART_Get:
 	sts		ASCII,r16			//puts data into ASCII
 	ret							
 
+.global UART_Poll
+UART_Poll:
+	lds		r18,UCSR0A			//recives register status from UART
+	sbrs	r18,RXC0			//skips next line if data was recieved
+	ret
+	lds		r18,UDR0			//recives data 
+	sts		ASCII,r18			//puts data into ASCII
+	ret	
+	
 .global UART_Put
 UART_Put:
 	lds		r17,UCSR0A			//recives register status from UART
