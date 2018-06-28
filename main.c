@@ -47,12 +47,7 @@ void EEMEMORYL(void);
 void EEMEMORYR(void);
 
 
-<<<<<<< HEAD
-=======
-int EELOCH;						//memory location for EEPROM storing High and Low
-int EELOCL;
 
->>>>>>> 41fa31e6148c2851788cfbce6e446be8a5cbc67c
 int BAUDH;						
 int BAUDL;
 int USARTDATA;					//used to set or clear bits in UCSR0B or UCSR0C
