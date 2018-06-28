@@ -1,7 +1,7 @@
  // Lab3P1.s
  //
- // Created: 1/30/2018 4:15:16 AM
- // Author : Eugene Rockey
+ // Created: 6/21/2018 4:15:16 AM
+ // Author : Group 1
  // Copyright 2018, All Rights Reserved
 
  //Greg 
@@ -167,6 +167,15 @@ UART_Get:
 	sts		ASCII,r16			//puts data into ASCII
 	ret							
 
+.global UART_Poll
+UART_Poll:
+	lds		r18,UCSR0A			//recives register status from UART
+	sbrs	r18,RXC0			//skips next line if data was recieved
+	ret
+	lds		r18,UDR0			//recives data 
+	sts		ASCII,r18			//puts data into ASCII
+	ret	
+	
 .global UART_Put
 UART_Put:
 	lds		r17,UCSR0A			//recives register status from UART
@@ -179,44 +188,45 @@ UART_Put:
 //Mason
 .global ADC_Get
 ADC_Get:
-		ldi	r16,0xC7			//Sets 0xC7 to register 16 to be loaded into address ADCSRA  
-		sts	ADCSRA,r16			//r16 is stored to address ADSRA for use in loop
-A2V1:	        lds	r16,ADCSRA		        //loads value stored in ADSRA to r16 a reset of the value
-		sbrc	r16,ADSC			//If the bit in r16 is cleared skips the next instruction, this will end the loop
+	ldi		r16,0xC7			//Sets 0xC7 to register 16 to be loaded into address ADCSRA  
+	sts		ADCSRA,r16			//r16 is stored to address ADSRA for use in loop
+A2V1:
+	lds		r16,ADCSRA			//loads value stored in ADSRA to r16 a reset of the value
+	sbrc	r16,ADSC			//If the bit in r16 is cleared skips the next instruction, this will end the loop
 	rjmp 	A2V1				//Jumps back to A2V1 to create loop 
-	lds	r16,ADCL			//The low value of the ADC port is stored in r16
-		sts	LADC,r16			//Then the value of ADCL is loaded into a global address to be used in C program
-		lds	r16,ADCH			//The high value of the ADC port is stored in r16
-		sts	HADC,r16			//Then stored to the global address HADC to be used in C program
-		ret					//Returns to the section where call was made
+	lds		r16,ADCL			//The low value of the ADC port is stored in r16
+	sts		LADC,r16			//Then the value of ADCL is loaded into a global address to be used in C program
+	lds		r16,ADCH			//The high value of the ADC port is stored in r16
+	sts		HADC,r16			//Then stored to the global address HADC to be used in C program
+	ret							//Returns to the section where call was made
 
 .global EEPROM_Write
 EEPROM_Write:      
-		sbic    EECR,EEPE
-		rjmp    EEPROM_Write		; Wait for completion of previous write
-		lds		r18,EELOCH			; Set up address (r18:r17) in address register
-		lds		r17,EELOCL 
-		ldi		r16,'F'				; Set up data in r16    
-		out     EEARH, r18      
-		out     EEARL, r17			      
-		out     EEDR,r16			; Write data (r16) to Data Register  
-		sbi     EECR,EEMPE			; Write logical one to EEMPE
-		sbi     EECR,EEPE			; Start eeprom write by setting EEPE
-		ret 
+	sbic    EECR,EEPE
+	rjmp    EEPROM_Write		; Wait for completion of previous write
+	lds		r18,EELOCH			; Set up address (r18:r17) in address register
+	lds		r17,EELOCL 
+	ldi		r16,'F'				; Set up data in r16    
+	out     EEARH, r18      
+	out     EEARL, r17			      
+	out     EEDR,r16			; Write data (r16) to Data Register  
+	sbi     EECR,EEMPE			; Write logical one to EEMPE
+	sbi     EECR,EEPE			; Start eeprom write by setting EEPE
+	ret 
 
 .global EEPROM_Read
 EEPROM_Read:					    
-		sbic    EECR,EEPE    
-		rjmp    EEPROM_Read		; Wait for completion of previous write
-		lds		r18,EELOCH		; Set up address (r18:r17) in EEPROM address register
-		lds		r17,EELOCL
-		ldi		r16,0x00   
-		out     EEARH, r18   
-		out     EEARL, r17		   
-		sbi     EECR,EERE		; Start eeprom read by writing EERE
-		in      r16,EEDR		; Read data from Data Register
-		sts		ASCII,r16  
-		ret
+	sbic    EECR,EEPE    
+	rjmp    EEPROM_Read			; Wait for completion of previous write
+	lds		r18,EELOCH			; Set up address (r18:r17) in EEPROM address register
+	lds		r17,EELOCL
+	ldi		r16,0x00   
+	out     EEARH, r18   
+	out     EEARL, r17		   
+	sbi     EECR,EERE			; Start eeprom read by writing EERE
+	in      r16,EEDR			; Read data from Data Register
+	sts		ASCII,r16  
+	ret
 
 .global EEMEMORYH
 EEMEMORYH:
@@ -243,49 +253,49 @@ EEMEMORYR:
 
 .global SETC
 SETC: 
-		lds		r16, UCSR0C
-		lds		r17, USARTDATA
-		or		r16, r17
-		sts		UCSR0C, r16
-		ret		
+	lds		r16, UCSR0C
+	lds		r17, USARTDATA
+	or		r16, r17
+	sts		UCSR0C, r16
+	ret		
 
 .global CLEARC
 CLEARC: 
-		lds		r16, UCSR0C
-		ldi		r17, 0xFF
-		lds		r18, USARTDATA
-		sub		r17, r18
-		and		r16, r17
-		sts		UCSR0C, r16
-		ret
+	lds		r16, UCSR0C
+	ldi		r17, 0xFF
+	lds		r18, USARTDATA
+	sub		r17, r18
+	and		r16, r17
+	sts		UCSR0C, r16
+	ret
 
 .global SETB
 SETB: 
-		lds		r16, UCSR0B
-		ldi		r17, 0xFF
-		lds		r18, USARTDATA
-		sub		r17, r18
-		and		r16, r17
-		sts		UCSR0B, r16
-		ret
-
+	lds		r16, UCSR0B
+	ldi		r17, 0xFF
+	lds		r18, USARTDATA
+	sub		r17, r18
+	and		r16, r17
+	sts		UCSR0B, r16
+	ret
+	
 .global CLEARB
 CLEARB:
-		lds		r16, UCSR0B
-		lds		r17, USARTDATA
-		or		r16, r17
-		sts		UCSR0B, r16
-		ret
+	lds		r16, UCSR0B
+	lds		r17, USARTDATA
+	or		r16, r17
+	sts		UCSR0B, r16
+	ret
 
 .global SETBAUD
 SETBAUD:
-		lds		r16, BAUDL
-		lds		r17, BAUDH
-		sts		UBRR0L,r16
-		sts		UBRR0H,r17
-		ret
+	lds		r16, BAUDL
+	lds		r17, BAUDH
+	sts		UBRR0L,r16
+	sts		UBRR0H,r17
+	ret
 
-		.end
+.end
 
 
 
