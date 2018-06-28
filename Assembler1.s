@@ -36,9 +36,9 @@
 .equ	EEPE,1						//student comment here
 .equ	EEMPE,2						//student comment here
 .equ	EERIE,3						//student comment here
+.equ	EELOCH,0
+.equ	EELOCL,0
 
-.global EELOCH
-.global EELOCL
 .global BAUDH
 .global BAUDL
 .global USARTDATA
@@ -227,6 +227,29 @@ EEPROM_Read:
 	in      r16,EEDR			; Read data from Data Register
 	sts		ASCII,r16  
 	ret
+
+.global EEMEMORYH
+EEMEMORYH:
+		lds	r16, EELOCH
+		lds	r17, DATA
+		add	r16, r17
+		sts	EELOCH, r16
+		ret
+
+.global EEMEMORYL
+EEMEMORYL:
+		lds	r16, EELOCL
+		lds	r17, DATA
+		add	r16, r17
+		sts	EELOCL, r16
+		ret
+			
+.global EEMEMORYR
+EEMEMORYR:
+		ldi	r16, 0
+		sts	EELOCH, r16
+		sts EELOCL, r16
+		ret
 
 .global SETC
 SETC: 
