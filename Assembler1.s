@@ -1,7 +1,7 @@
  // Lab3P1.s
  //
- // Created: 1/30/2018 4:15:16 AM
- // Author : Eugene Rockey
+ // Created: 6/21/2018 4:15:16 AM
+ // Author : Group 1
  // Copyright 2018, All Rights Reserved
 
  //Greg 
@@ -36,9 +36,9 @@
 .equ	EEPE,1						//student comment here
 .equ	EEMPE,2						//student comment here
 .equ	EERIE,3						//student comment here
+.equ	EELOCH,0
+.equ	EELOCL,0
 
-.global EELOCH
-.global EELOCL
 .global BAUDH
 .global BAUDL
 .global USARTDATA
@@ -167,6 +167,15 @@ UART_Get:
 	sts		ASCII,r16			//puts data into ASCII
 	ret							
 
+.global UART_Poll
+UART_Poll:
+	lds		r18,UCSR0A			//recives register status from UART
+	sbrs	r18,RXC0			//skips next line if data was recieved
+	ret
+	lds		r18,UDR0			//recives data 
+	sts		ASCII,r18			//puts data into ASCII
+	ret	
+	
 .global UART_Put
 UART_Put:
 	lds		r17,UCSR0A			//recives register status from UART
@@ -218,6 +227,30 @@ EEPROM_Read:
 	in      r16,EEDR			; Read data from Data Register
 	sts		ASCII,r16  
 	ret
+
+	
+.global EEMEMORYH
+EEMEMORYH:
+		lds	r16, EELOCH
+		lds	r17, DATA
+		add	r16, r17
+		sts	EELOCH, r16
+		ret
+
+.global EEMEMORYL
+EEMEMORYL:
+		lds	r16, EELOCL
+		lds	r17, DATA
+		add	r16, r17
+		sts	EELOCL, r16
+		ret
+			
+.global EEMEMORYR
+EEMEMORYR:
+		ldi	r16, 0
+		sts	EELOCH, r16
+		sts EELOCL, r16
+		ret
 
 .global SETC
 SETC: 
