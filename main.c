@@ -145,7 +145,7 @@ while(ASCII == '\0' )
 	temp[0x3] = i % 10 + 48;						//Calculates the values for the decimal
 
 	UART_Puts(temp);								//Puts the full char array of 'temp'
-	UART_Puts(MS7);									//Puts MS7 which is ºF
+	UART_Puts(MS7);									//Puts MS7 which is ÂºF
 
 	ASCII = '\0';
 	UART_Poll();
@@ -171,36 +171,36 @@ void EEPROM(void)
 	*/
 	UART_Puts("\r\ninput memory location in this format: 0x####\n\r");
 	EEMEMORYR();
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)			//gets memory address
 	{
 		ASCII = '\0';
 		while (ASCII == '\0')
 		{
 			UART_Get();
 		}
-		UART_Put();
-			if(i == 2)
+		UART_Put();				//gets each character of the address
+			if(i == 2)			//if 0x#000
 			{
-				DATA = ASCII-48;
-				DATA*=16;
-				EEMEMORYH();
+				DATA = ASCII-48;	//transfer to data
+				DATA*=16;		//correctly weight it from HEX to decimal
+				EEMEMORYH();		//add value to High memory location
 			}
 			if (i == 3)
 			{
-				DATA = ASCII-48;
-				EEMEMORYH();
+				DATA = ASCII-48;	//transfer to data
+				EEMEMORYH();		//add value to High memory location
 			}
 				
 			if (i == 4)
 			{
-				DATA = ASCII-48;
-				DATA*=16;
-				EEMEMORYL();
+				DATA = ASCII-48;	//transfer to data	
+				DATA*=16;		//correctly weight it from HEX to decimal
+				EEMEMORYL();		//add value to Low memory location
 			}
 			if (i == 5)
 			{
-				DATA = ASCII-48;
-				EEMEMORYL();
+				DATA = ASCII-48;	//transfer to data	
+				EEMEMORYL();		//add value to Low memory location
 			}
 			
 	}
@@ -220,22 +220,22 @@ void BAUD(void)
 	{
 		UART_Get();
 	}
-	switch (ASCII)
+	switch (ASCII)		//menu allows user to select baud rate
 	{
 		case '1':
 		BAUDH = 0;
-		BAUDL = 103;
-		SETBAUD();
+		BAUDL = 103;	//convert 9600 to correct value
+		SETBAUD();	//sets UBRRL and UBRRH in assembly
 		break;
 		case '2':
 		BAUDH = 1;
-		BAUDL = 159;
-		SETBAUD();
+		BAUDL = 159;	//convert 2400 to correct value
+		SETBAUD();	//sets UBRRL and UBRRH in assembly
 		break;
 		case '3':
 		BAUDH = 3;
-		BAUDL = 63;
-		SETBAUD();
+		BAUDL = 63;	//convert 1200 to correct value
+		SETBAUD();	//sets UBRRL and UBRRH in assembly
 		break;
 		default:
 		UART_Puts("\r\nIncorrect input\r\n");
@@ -254,38 +254,38 @@ void DATAb(void)
 	}
 	switch (ASCII)
 	{
-		case '1':
+		case '1':		//sets bits 2:1 in UCSR0C to 00
 		USARTDATA = 6;
 		CLEARC();
-		USARTDATA = 4;
+		USARTDATA = 4;		//sets bit 2 in UCSR0B to 0
 		CLEARB();
 		break;
-		case '2':
+		case '2':		//sets bits 2:1 in UCSR0C to 01
 		USARTDATA = 4;
 		CLEARC();
-		USARTDATA = 2;
+		USARTDATA = 2;	
 		SETC();
-		USARTDATA = 4;
+		USARTDATA = 4;		//sets bit 2 in UCSR0B to 0
 		CLEARB();
 		break;
-		case '3':
+		case '3':		//sets bits 2:1 in UCSR0C to 10
 		USARTDATA = 4;
 		SETC();
 		USARTDATA = 2;
 		CLEARC();
-		USARTDATA = 4;
+		USARTDATA = 4;		//sets bit 2 in UCSR0B to 0
 		CLEARB();
 		break;
 		case '4':
-		USARTDATA = 6;
+		USARTDATA = 6;		//sets bits 2:1 in UCSR0C to 11
 		SETC();
-		USARTDATA = 4;
+		USARTDATA = 4;		//sets bit 2 in UCSR0B to 0
 		CLEARB();
 		break;
 		case '5':
-		USARTDATA = 6;
+		USARTDATA = 6;		//sets bits 2:1 in UCSR0C to 11
 		SETC();
-		USARTDATA = 4;
+		USARTDATA = 4;		//sets bit 2 in UCSR0B to 1
 		SETB();
 		break;
 		default:
@@ -305,17 +305,17 @@ void PARITY(void)
 	switch (ASCII)
 	{
 		case '1':
-		USARTDATA = 48;
+		USARTDATA = 48;		//sets bits 5:4 in UCSR0C to 00
 		CLEARC();
 		break;
 		case '2':
-		USARTDATA = 32;
+		USARTDATA = 32;		//sets bits 5:4 in UCSR0C to 10
 		SETC();
-		USARTDATA = 16;
+		USARTDATA = 16;		
 		CLEARC();
 		break;
 		case '3':
-		USARTDATA = 48;
+		USARTDATA = 48;		//sets bits 5:4 in UCSR0C to 11
 		SETC();
 		break;
 		default:
@@ -335,9 +335,9 @@ void STOPb(void)
 	}
 	switch (ASCII)
 	{
-		case '1': CLEARC();
+		case '1': CLEARC();		//sets bit 3 in UCSR0C to 0
 		break;
-		case '2': SETC();
+		case '2': SETC();		//sets bit 3 in UCSR0C to 1
 		break;
 		default:
 		UART_Puts("\r\nIncorrect input\r\n");
@@ -353,7 +353,7 @@ void USART(void)
 	{
 		UART_Get();
 	}
-	switch (ASCII)
+	switch (ASCII)				//menu to select which function
 	{
 		case '1': BAUD();
 		break;
