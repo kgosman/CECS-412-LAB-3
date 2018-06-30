@@ -39,9 +39,9 @@
 .equ	EELOCH,0
 .equ	EELOCL,0
 
-.global BAUDH
-.global BAUDL
-.global USARTDATA
+.global BAUDH				//high baud rate value
+.global BAUDL				//low baud rate value
+.global USARTDATA			// used to set or clear bits in UCSR0B and UCSR0C
 
 .global HADC				//student comment here
 .global LADC				//student comment here
@@ -231,66 +231,66 @@ EEPROM_Read:
 	
 .global EEMEMORYH
 EEMEMORYH:
-		lds	r16, EELOCH
+		lds	r16, EELOCH		//adds value of data to high EEPROM location
 		lds	r17, DATA
 		add	r16, r17
-		sts	EELOCH, r16
+		sts	EELOCH, r16		//used to get input memory location
 		ret
 
 .global EEMEMORYL
 EEMEMORYL:
-		lds	r16, EELOCL
+		lds	r16, EELOCL		//adds value of data to low EEPROM location
 		lds	r17, DATA
 		add	r16, r17
-		sts	EELOCL, r16
+		sts	EELOCL, r16		//used to get input memory location
 		ret
 			
 .global EEMEMORYR
 EEMEMORYR:
-		ldi	r16, 0
+		ldi	r16, 0			//resets EEPROM memory location to 0
 		sts	EELOCH, r16
-		sts EELOCL, r16
+		sts 	EELOCL, r16
 		ret
 
 .global SETC
 SETC: 
-	lds		r16, UCSR0C
+	lds		r16, UCSR0C		//sets bits in UCSR0C that are high in USARTDATA
 	lds		r17, USARTDATA
 	or		r16, r17
-	sts		UCSR0C, r16
+	sts		UCSR0C, r16		//used to change parity, #of stop bits, and character size
 	ret		
 
 .global CLEARC
 CLEARC: 
-	lds		r16, UCSR0C
+	lds		r16, UCSR0C		//clears bits in UCSR0C that are high in USARTDATA
 	ldi		r17, 0xFF
 	lds		r18, USARTDATA
 	sub		r17, r18
-	and		r16, r17
-	sts		UCSR0C, r16
+	and		r16, r17		
+	sts		UCSR0C, r16		//used to change parity, #of stop bits, and character size
 	ret
 
 .global SETB
 SETB: 
-	lds		r16, UCSR0B
+	lds		r16, UCSR0B		//sets bits in UCSR0B that are high in USARTDATA
 	ldi		r17, 0xFF
 	lds		r18, USARTDATA
 	sub		r17, r18
 	and		r16, r17
-	sts		UCSR0B, r16
+	sts		UCSR0B, r16		//used to change character size
 	ret
 	
 .global CLEARB
 CLEARB:
-	lds		r16, UCSR0B
+	lds		r16, UCSR0B		//clears bits in UCSR0B that are high in USARTDATA
 	lds		r17, USARTDATA
 	or		r16, r17
-	sts		UCSR0B, r16
+	sts		UCSR0B, r16		//used to change character size
 	ret
 
 .global SETBAUD
 SETBAUD:
-	lds		r16, BAUDL
+	lds		r16, BAUDL	//sets the baud rate using the BAUDL and BAUDH registers
 	lds		r17, BAUDH
 	sts		UBRR0L,r16
 	sts		UBRR0H,r17
