@@ -39,19 +39,15 @@
 .equ	EERIE,3						//EEPORM Ready interrupt enable
 .equ	EELOCH,0					//EEPROM programming mode bits.
 .equ	EELOCL,0					//EEPROM programming mode bits. 
-
 .global BAUDH						//initilizing baud rate
 .global BAUDL						//initilizing baud rate
 .global USARTDATA					//initilizing usart data 
-
-.global HADC				//
-.global LADC				//
-.global ASCII				//declare ascii global to communicate with main
-.global DATA				//importing data function
-
-.set	temp,0				//student comment here
-
-.section ".text"			//student comment here
+.global HADC						//high voltage for adc values
+.global LADC						//low voltage for adc values
+.global ASCII						//declare ascii global to communicate with main
+.global DATA						//importing data function
+.set	temp,0						//temp to 0 
+.section ".text"					//text string 
 
 //Mo
 .global Mega328P_Init
