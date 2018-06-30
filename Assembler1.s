@@ -4,49 +4,50 @@
  // Author : Group 1
  // Copyright 2018, All Rights Reserved
 
+
  //Greg 
-.section ".data"					//student comment here
-.equ	DDRB,0x04					//student comment here
-.equ	DDRD,0x0A					//student comment here
-.equ	PORTB,0x05					//student comment here
-.equ	PORTD,0x0B					//student comment here
-.equ	U2X0,1						//student comment here
-.equ	UBRR0L,0xC4					//student comment here
-.equ	UBRR0H,0xC5					//student comment here
-.equ	UCSR0A,0xC0					//student comment here
-.equ	UCSR0B,0xC1					//student comment here
-.equ	UCSR0C,0xC2					//student comment here
-.equ	UDR0,0xC6					//student comment here
-.equ	RXC0,0x07					//student comment here
-.equ	UDRE0,0x05					//student comment here
-.equ	ADCSRA,0x7A					//student comment here
-.equ	ADMUX,0x7C					//student comment here
-.equ	ADCSRB,0x7B					//student comment here
-.equ	DIDR0,0x7E					//student comment here
-.equ	DIDR1,0x7F					//student comment here
-.equ	ADSC,6						//student comment here
-.equ	ADIF,4						//student comment here
-.equ	ADCL,0x78					//student comment here
-.equ	ADCH,0x79					//student comment here
-.equ	EECR,0x1F					//student comment here
-.equ	EEDR,0x20					//student comment here
-.equ	EEARL,0x21					//student comment here
-.equ	EEARH,0x22					//student comment here
-.equ	EERE,0						//student comment here
-.equ	EEPE,1						//student comment here
-.equ	EEMPE,2						//student comment here
-.equ	EERIE,3						//student comment here
-.equ	EELOCH,0
-.equ	EELOCL,0
+.section ".data"					
+.equ	DDRB,0x04					//used to address I/O registers as data space locations
+.equ	DDRD,0x0A					//configuring I/O registers as data space location
+.equ	PORTB,0x05					//port b loaded with 0x05
+.equ	PORTD,0x0B					//Port D loaded with 0x0B = 11
+.equ	U2X0,1						//Setting the second bit.
+.equ	UBRR0L,0xC4					//Usart baud rate low register 
+.equ	UBRR0H,0xC5					//Usart baud rate high generator.
+.equ	UCSR0A,0xC0					//Usart control and status register - a
+.equ	UCSR0B,0xC1					//Usart control and status register - b
+.equ	UCSR0C,0xC2					//Usart control and status register - c
+.equ	UDR0,0xC6					//Usart transmit data buffer data (TXB)register
+.equ	RXC0,0x07					//Usart recieve complete flag
+.equ	UDRE0,0x05					//transmit buffor
+.equ	ADCSRA,0x7A					//Analog comparator multiplexed input
+.equ	ADMUX,0x7C					//stores refrence voltatge by writing in the REFSn bits in ADMUX register
+.equ	ADCSRB,0x7B					//ADC trigger select bits in Status register B
+.equ	DIDR0,0x7E					//Digital input disable register 0
+.equ	DIDR1,0x7F					//Digital input disable register 1 
+.equ	ADSC,6						//ADC control and status register c
+.equ	ADIF,4						//ADC control and status register f
+.equ	ADCL,0x78					//ADC data register.
+.equ	ADCH,0x79					//ADC data register.
+.equ	EECR,0x1F					//Start EEPROM write
+.equ	EEDR,0x20					//contains data to be written to the EEPROM in the address given by the EEAR register
+.equ	EEARL,0x21					//specify the EEPROM address in EEPROM space
+.equ	EEARH,0x22					//specify the EEPROM address in EEPROM space
+.equ	EERE,0						//EEPROM read Enable. 
+.equ	EEPE,1						//EEPROM write Enable
+.equ	EEMPE,2						//EEPROM master write enable
+.equ	EERIE,3						//EEPORM Ready interrupt enable
+.equ	EELOCH,0					//EEPROM programming mode bits.
+.equ	EELOCL,0					//EEPROM programming mode bits. 
 
-.global BAUDH
-.global BAUDL
-.global USARTDATA
+.global BAUDH						//initilizing baud rate
+.global BAUDL						//initilizing baud rate
+.global USARTDATA					//initilizing usart data 
 
-.global HADC				//student comment here
-.global LADC				//student comment here
-.global ASCII				//student comment here
-.global DATA				//student comment here
+.global HADC				//
+.global LADC				//
+.global ASCII				//declare ascii global to communicate with main
+.global DATA				//importing data function
 
 .set	temp,0				//student comment here
 
