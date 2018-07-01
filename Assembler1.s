@@ -56,84 +56,84 @@
 .global Mega328P_Init
 Mega328P_Init:
 		ldi	r16,0x07		;PB0(R*W),PB1(RS),PB2(E) as fixed outputs
-		out	DDRB,r16		//student comment here
-		ldi	r16,0			//student comment here
-		out	PORTB,r16		//student comment here
+		out	DDRB,r16		//store the data into DDRB to determine if pin B is ussed for input or output
+		ldi	r16,0			//set the register back to 0
+		out	PORTB,r16		//use the data in the register storing it in the address to port B
 		out	U2X0,r16		;initialize UART, 8bits, no parity, 1 stop, 9600
-		ldi	r17,0x0			//student comment here
-		ldi	r16,0x67		//student comment here
-		sts	UBRR0H,r17		//student comment here
-		sts	UBRR0L,r16		//student comment here
-		ldi	r16,24			//student comment here
-		sts	UCSR0B,r16		//student comment here
-		ldi	r16,6			//student comment here
-		sts	UCSR0C,r16		//student comment here
+		ldi	r17,0x0			//initialize register 17 with 0x0
+		ldi	r16,0x67		//initialize register 16 with 0x67
+		sts	UBRR0H,r17		//set baud rate for high
+		sts	UBRR0L,r16		//set baud rate for low
+		ldi	r16,24			//load 24 into register 16
+		sts	UCSR0B,r16		//enable reciever and transistor 
+		ldi	r16,6			//load 6 into r 16
+		sts	UCSR0C,r16		//set frame rate based off register 16
 		ldi r16,0x87		//initialize ADC
-		sts	ADCSRA,r16		//student comment here
-		ldi r16,0x40		//student comment here
-		sts ADMUX,r16		//student comment here
-		ldi r16,0			//student comment here
-		sts ADCSRB,r16		//student comment here
-		ldi r16,0xFE		//student comment here
-		sts DIDR0,r16		//student comment here
-		ldi r16,0xFF		//student comment here
-		sts DIDR1,r16		//student comment here
-		ret					//student comment here
+		sts	ADCSRA,r16		//set the initialized ADC into the ADC control and status A
+		ldi r16,0x40		//initialize for ADC multiplexer with 0x40
+		sts ADMUX,r16		//set the initialized value into the ADC multiplexer selection.
+		ldi r16,0			//initialize ADC
+		sts ADCSRB,r16		//set the initialized ADC into the ADC control and status B
+		ldi r16,0xFE		//Initialize disable value
+		sts DIDR0,r16		//Digital disable register 0 with 0xFE
+		ldi r16,0xFF		//initialize diable value
+		sts DIDR1,r16		//Digital disable register 0 with 0xFF
+		ret					//return status of the initalization, and returns the stack pointer.
 	
 //Kaden
 .global LCD_Write_Command
 LCD_Write_Command:
-	call	UART_Off		//student comment here
+	call	UART_Off		//disables reciever and transistor
 	ldi		r16,0xFF		;PD0 - PD7 as outputs
-	out		DDRD,r16		//student comment here
-	lds		r16,DATA		//student comment here
-	out		PORTD,r16		//student comment here
-	ldi		r16,4			//student comment here
-	out		PORTB,r16		//student comment here
-	call	LCD_Delay		//student comment here
-	ldi		r16,0			//student comment here
-	out		PORTB,r16		//student comment here
-	call	LCD_Delay		//student comment here
-	call	UART_On			//student comment here
-	ret						//student comment here
+	out		DDRD,r16		//store the data into DDRD to determine if pin D is ussed for input or output
+	lds		r16,DATA		//load DATA into register 16
+	out		PORTD,r16		//use the data in the register storing it in the address to port D
+	ldi		r16,4			//load 4 into register 16
+	out		PORTB,r16		//use the data in the register storing it in the address to port B
+	call	LCD_Delay		//Call some delay to give it time for the port
+	ldi		r16,0			//load 0 into register 16
+	out		PORTB,r16		//use the data in the register storing it in the address to port B
+	call	LCD_Delay		//Call some delay to give it time for the port
+	call	UART_On			//enable reciever and transistor
+	ret						//returns the write command and stack pointer
 
 .global LCD_Delay
 LCD_Delay:
-	ldi		r16,0xFA		//student comment here
-D0:	ldi		r17,0xFF		//student comment here
-D1:	dec		r17				//student comment here
-	brne	D1				//student comment here
-	dec		r16				//student comment here
-	brne	D0				//student comment here
-	ret						//student comment here
+	ldi		r16,0xFA		//loads 0xFA into register 16
+D0:	ldi		r17,0xFF		//loads 0xFF into register 17
+D1:	dec		r17				//decrement value in register 17 by 1
+	brne	D1				//without zero flag it will go back to D1
+	dec		r16				//decrement value in register 16 by 1
+	brne	D0				//without zero flag it will go back to D0
+	ret						//return the stack pointer, and provided a delay
 
 .global LCD_Write_Data
 LCD_Write_Data:
-	call	UART_Off		//student comment here
-	ldi		r16,0xFF		//student comment here
-	out		DDRD,r16		//student comment here
-	lds		r16,DATA		//student comment here
-	out		PORTD,r16		//student comment here
-	ldi		r16,6			//student comment here
-	out		PORTB,r16		//student comment here
-	call	LCD_Delay		//student comment here
-	ldi		r16,0			//student comment here
-	out		PORTB,r16		//student comment here
-	call	LCD_Delay		//student comment here
-	call	UART_On			//student comment here
-	ret						//student comment here
+	call	UART_Off		//disables reciever and transistor
+	ldi		r16,0xFF		//PD0 - PD7 as outputs
+	out		DDRD,r16		//store the data into DDRD to determine if pin D is ussed for input or output
+	lds		r16,DATA		//load DATA into register 16
+	out		PORTD,r16		//use the data in the register storing it in the address to port D
+	ldi		r16,6			//load 6 into register 16
+	out		PORTB,r16		//use the data in the register storing it in the address to port B
+	call	LCD_Delay		//Call some delay to give it time for the port
+	ldi		r16,0			//load 0 into register 16
+	out		PORTB,r16		//use the data in the register storing it in the address to port B
+	call	LCD_Delay		//Call some delay to give it time for the port
+	call	UART_On			//enable reciever and transistor
+	ret						//returns the write data and stack pointer (write to the LCD)
 
 .global LCD_Read_Data
 LCD_Read_Data:
-	call	UART_Off		//student comment here
-	ldi		r16,0x00		//student comment here
-	out		DDRD,r16		//student comment here
-	out		PORTB,4			//student comment here
-	in		r16,PORTD		//student comment here
-	sts		DATA,r16		//student comment here
-	out		PORTB,0			//student comment here
-	call	UART_On			//student comment here
-	ret						//student comment here
+	call	UART_Off		//disables reciever and transistor
+	ldi		r16,0x00		//setting the value for ports
+	out		DDRD,r16		//store the data into DDRD to determine if pin D is ussed for input or output
+	out		PORTB,4			//use the data 4 storing it in the address to port B
+	in		r16,PORTD		//Taking what is at port D data register and taking it in as input
+	sts		DATA,r16		//load register 16 into DATA
+	out		PORTB,0			//use the data 0 storing it in the address to port B
+	call	UART_On			//enable reciever and transistor
+	ret						//returns the read data and stack pointer (LCD can read it)
 
 //Austin
 .global UART_On
